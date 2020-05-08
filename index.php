@@ -32,7 +32,35 @@ if (isset($_POST['addBtn'])) {
       '<div class="alert alert-danger" role="alert">
         All field must have value
       </div>';
-  } else {
+  } else if(is_numeric($title) || is_numeric($content) || is_numeric($author)){
+       $message = 
+      '<div class="alert alert-danger" role="alert">
+        Number is not allowed.
+      </div>';
+  }else if(!preg_match("/^[a-zA-Z ]*$/",$title)){
+       $message = 
+      '<div class="alert alert-danger" role="alert">
+        Only letter and whitespace are allowed in Title.
+      </div>';
+  }else if(!preg_match("/^[a-zA-Z ]*$/",$author)){
+       $message = 
+      '<div class="alert alert-danger" role="alert">
+        Only letter and whitespace are allowed in Author.
+      </div>';
+  }else if(strlen($title) > 30){
+       $message = 
+      '<div class="alert alert-danger" role="alert">
+        Title must be less than 30 character.
+      </div>';
+  }else if(strlen($author)> 30){
+       $message = 
+      '<div class="alert alert-danger" role="alert">
+        Author must be less than 30 character.
+      </div>';
+  }
+    
+    
+    else {
     try {
       $query = "
         INSERT INTO posts (title, content, author)
@@ -44,6 +72,12 @@ if (isset($_POST['addBtn'])) {
       $stmt->bindValue(':content', $content);
       $stmt->bindValue(':author', $author);
       $stmt->execute();
+        
+    $message = 
+      '<div class="alert alert-danger" role="alert">
+        Successfully uploaded.
+      </div>';
+        
     } catch (\PDOException $e) {
       throw new \PDOException($e->getMessage(), (int) $e->getCode());
     }
