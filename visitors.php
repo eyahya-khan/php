@@ -5,7 +5,7 @@ require('dbconnect.php');
 
 //read more
 session_start();
-$_SESSION['abc'] = $_POST['hidId'];
+
 
 
 //show the table
@@ -56,7 +56,7 @@ try {
 <!--
                     <form action="individual.php" method="post">
                     <a href="individual.php">
-                <input type="hidden" name="hidId" value="">
+                <input type="hidden" name="hidId" value="<?=$pun['id']?>">
 					read more
                    </a>						
                     </form>

@@ -3,26 +3,35 @@
 // database connection
 require('dbconnect.php'); 
 
+//
+//session_start();
+//$_SESSION['abc'] = $_GET['hidID'];
 
-session_start(); 
-$_SESSION['abc'] = $_GET['hidID'];
 
+ echo "<pre>";
+ print_r($_GET['hidID']);
+ echo "</pre>";
 
 //show the table
- if(isset($_SESSION['abc'])){
-     $abc = $_SESSION['abc'];
+ 
 try {
 	
 	$stmt = $dbconnect->prepare("SELECT title,content,author,published_date FROM posts
-    WHERE id = $abc ");
-   
-	$puns = $stmt->fetch(); 
+    WHERE id = :id");
+    $stmt->bindValue(':id',$_GET['hidID']);
+	$pun = $stmt->fetch(); 
+    
 } catch (\PDOException $e) {
 	throw new \PDOException($e->getMessage(), (int) $e->getCode());
 }
- }
+
 ?>
 
+<?php
+echo "<pre>";
+ print_r($pun);
+ echo "</pre>";
+ ?>
 
 <!doctype html>
 <html lang="en">
@@ -43,10 +52,7 @@ try {
         <div class="offset-3 col-6">
 
           <h1>Individual Blog</h1>
-          
-
-   	<?php foreach ($puns as $key => $pun) { ?>
-                      
+                            
 					<h3 style="background-color:Tomato;">
 					<?php echo $pun['title'] ?>
 					</h3>
@@ -57,9 +63,7 @@ try {
                     </p>
 					<h4><?php echo $pun['author'] ?></h4>
 					<p><?php echo $pun['published_date'] ?></p>	
-    <?php } ?>
-
-		
+    
         </div>
       </div>
     </div>
