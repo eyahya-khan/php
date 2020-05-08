@@ -52,13 +52,16 @@ try {
                     echo $firstSentence;
                     ?>
                     
-                    <form action="#" method="post">
+                     <a href="individual.php?hidID=<?=$pun['id']?>">read more</a>
+<!--
+                    <form action="individual.php" method="post">
                     <a href="individual.php">
-                <input type="hidden" name="hidId" value="<?=$pun['id']?>">
+                <input type="hidden" name="hidId" value="">
 					read more
                    </a>						
                     </form>
                     
+-->
                     
 					<h4><?php echo $pun['author'] ?></h4>
 					<p><?php echo $pun['published_date'] ?></p>	

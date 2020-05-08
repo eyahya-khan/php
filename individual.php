@@ -5,7 +5,7 @@ require('dbconnect.php');
 
 
 session_start(); 
-
+$_SESSION['abc'] = $_GET['hidID'];
 
 
 //show the table
@@ -14,8 +14,8 @@ session_start();
 try {
 	
 	$stmt = $dbconnect->prepare("SELECT title,content,author,published_date FROM posts
-    WHERE id = :id");
-    $stmt->bindValue(':id', $abc);
+    WHERE id = $abc ");
+   
 	$puns = $stmt->fetch(); 
 } catch (\PDOException $e) {
 	throw new \PDOException($e->getMessage(), (int) $e->getCode());
