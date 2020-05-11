@@ -95,6 +95,7 @@ if (isset($_POST['addBtn'])) {
 if (isset($_POST['updateBtn'])) { 
   $title = trim($_POST['title']);
   $post = trim($_POST['pun']);
+  $author = trim($_POST['author']);
 
   if (empty($post)) {
     $message = 
@@ -106,17 +107,23 @@ if (isset($_POST['updateBtn'])) {
       '<div class="alert alert-danger" role="alert">
         Title field must not be empty
       </div>';
+  }else if (empty($author)) {
+    $message = 
+      '<div class="alert alert-danger" role="alert">
+        Author field must not be empty
+      </div>';
   } else {
     try {
       $query = "
         UPDATE posts
-        SET content = :post,title = :title
+        SET content = :post,title = :title,author = :author
         WHERE id = :id;
       ";
 
       $stmt = $dbconnect->prepare($query);
       $stmt->bindValue(':title', $title);
       $stmt->bindValue(':post', $post);
+      $stmt->bindValue(':author', $author);
       $stmt->bindValue(':id', $_POST['id']);
       $stmt->execute();
     } catch (\PDOException $e) {
@@ -194,7 +201,7 @@ try {
                   <input type="submit" name="deleteBtn" value="Delete" class="btn btn-danger">
                 </form>
 
-                <button type="button" class="btn btn-warning float-right" data-toggle="modal" data-target="#exampleModal" data-title="<?=htmlentities($pun['title'])?>" data-pun="<?=htmlentities($pun['content'])?>" data-id="<?=htmlentities($pun['id'])?>">Update</button>
+                <button type="button" class="btn btn-warning float-right" data-toggle="modal" data-target="#exampleModal" data-title="<?=htmlentities($pun['title'])?>" data-author="<?=htmlentities($pun['author'])?>" data-pun="<?=htmlentities($pun['content'])?>" data-id="<?=htmlentities($pun['id'])?>">Update</button>
               </li>
             <?php } ?>
             
@@ -222,6 +229,9 @@ try {
                 
                   <label for="recipient-name" class="col-form-label">Update content: </label>  
                   <input type="text" class="form-control" name="pun" for="recipient-name">
+                  
+                  <label for="recipient-name" class="col-form-label">Update author: </label>  
+                  <input type="text" class="form-control" name="author" for="recipient-name">
                  
                   <input type="hidden" class="form-control" name="id">
                 </div>
@@ -249,11 +259,13 @@ try {
     var button = $(event.relatedTarget); // Button that triggered the modal
     var title = button.data('title'); // Extract info from data-* attributes
     var pun = button.data('pun'); // Extract info from data-* attributes
+    var author = button.data('author'); // Extract info from data-* attributes
     var id = button.data('id'); // Extract info from data-* attributes
    
     var modal = $(this);
     modal.find(".modal-body input[name='title']").val(title);
     modal.find(".modal-body input[name='pun']").val(pun);
+    modal.find(".modal-body input[name='author']").val(author);
     modal.find(".modal-body input[name='id']").val(id);
   });
 </script>
