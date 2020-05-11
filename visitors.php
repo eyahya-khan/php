@@ -3,16 +3,11 @@
 require('dbconnect.php'); 
 
 
-//read more
-session_start();
-
-
-
 //show the table
 try {
 	
 	$stmt = $dbconnect->query("SELECT * FROM posts");
-	$puns = $stmt->fetchAll(); 
+	$posts = $stmt->fetchAll(); 
 } catch (\PDOException $e) {
 	throw new \PDOException($e->getMessage(), (int) $e->getCode());
 }
@@ -29,42 +24,33 @@ try {
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    <title>Blog List</title>
+    <title>All Blog post</title>
   </head>
   <body>
    
        <div class="container">
       <div class="row">
-        <div class="offset-3 col-6">
+        <div class="offset-2 col-8">
 
-          <h1>All Blog Post with first sentence.</h1>
+          <h1 style="text-align:center;">All Blog Post with first sentence</h1>
    	
-   	<?php foreach ($puns as $key => $pun) { ?>
+   	<?php foreach ($posts as $key => $post) { ?>
                       
-					<h3 style="background-color:Tomato;">
-					<?php echo $pun['title'] ?>
+					<h3 style="background-color:Tomato;text-align:center;">
+					<?php echo $post['title'] ?>
 					</h3>
                    
             <!--Counting the first sentence-->
                     <?php
-                    $pos = strpos($pun['content'], '.');
-                    $firstSentence = substr($pun['content'], 0, $pos+1);
+                    $pos = strpos($post['content'], '.');
+                    $firstSentence = substr($post['content'], 0, $pos+1);
                     echo $firstSentence;
                     ?>
-                    
-                     <a href="individual.php?hidID=<?=$pun['id']?>">read more</a>
-<!--
-                    <form action="individual.php" method="post">
-                    <a href="individual.php">
-                <input type="hidden" name="hidId" value="<?=$pun['id']?>">
-					read more
-                   </a>						
-                    </form>
-                    
--->
-                    
-					<h4><?php echo $pun['author'] ?></h4>
-					<p><?php echo $pun['published_date'] ?></p>	
+            <!--sending id to individual.php page for fetching specific data-->
+                     <br><a href="individual.php?hidID=<?=$post['id']?>">read more</a>
+             
+					<h4 style="text-align:center;"><?php echo $post['author'] ?></h4>
+					<p style="text-align:center;"><?php echo $post['published_date'] ?></p>	
     <?php } ?>
 		
         </div>

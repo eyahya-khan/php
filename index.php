@@ -1,4 +1,5 @@
 <?php
+//database connection
 require('dbconnect.php');
 
 // Delete post
@@ -18,9 +19,7 @@ if (isset($_POST['deleteBtn'])) {
 }
 
 
-
-
-// Add new pun
+// Add new post
 $message = '';
 if (isset($_POST['addBtn'])) {
   $title = trim($_POST['title']);
@@ -30,32 +29,39 @@ if (isset($_POST['addBtn'])) {
   if (empty($title) || empty($content) || empty($author)) {
     $message = 
       '<div class="alert alert-danger" role="alert">
-        All field must have value
+        Title, Content, Author: All field must have value
       </div>';
   } else if(is_numeric($title) || is_numeric($content) || is_numeric($author)){
        $message = 
       '<div class="alert alert-danger" role="alert">
-        Number is not allowed.
+        Title, Content, Author: Only number is not allowed.
       </div>';
   }else if(!preg_match("/^[a-zA-Z ]*$/",$title)){
        $message = 
       '<div class="alert alert-danger" role="alert">
-        Only letter and whitespace are allowed in Title.
+        Title: Only letter and whitespace are allowed.
       </div>';
-  }else if(!preg_match("/^[a-zA-Z ]*$/",$author)){
+  }else if(!preg_match("/^[a-zA-Z]$/",$content[0])){
        $message = 
       '<div class="alert alert-danger" role="alert">
-        Only letter and whitespace are allowed in Author.
+        Content: Start with letter.
+      </div>';
+  }
+ 
+    else if(!preg_match("/^[a-zA-Z ]*$/",$author)){
+       $message = 
+      '<div class="alert alert-danger" role="alert">
+        Author: Only letter and whitespace are allowed.
       </div>';
   }else if(strlen($title) > 30){
        $message = 
       '<div class="alert alert-danger" role="alert">
-        Title must be less than 30 character.
+    Blog title must have less than 30 characters.
       </div>';
   }else if(strlen($author)> 30){
        $message = 
       '<div class="alert alert-danger" role="alert">
-        Author must be less than 30 character.
+        Author name must have less than 30 characters.
       </div>';
   }
     
@@ -87,23 +93,30 @@ if (isset($_POST['addBtn'])) {
 
 // Update blog
 if (isset($_POST['updateBtn'])) { 
-  $pun = trim($_POST['pun']);
+  $title = trim($_POST['title']);
+  $post = trim($_POST['pun']);
 
-  if (empty($pun)) {
+  if (empty($post)) {
     $message = 
       '<div class="alert alert-danger" role="alert">
-        Pun field must not be empty
+        Blog post field must not be empty
+      </div>';
+  }else if (empty($title)) {
+    $message = 
+      '<div class="alert alert-danger" role="alert">
+        Title field must not be empty
       </div>';
   } else {
     try {
       $query = "
         UPDATE posts
-        SET content = :pun
+        SET content = :post,title = :title
         WHERE id = :id;
       ";
 
       $stmt = $dbconnect->prepare($query);
-      $stmt->bindValue(':pun', $pun);
+      $stmt->bindValue(':title', $title);
+      $stmt->bindValue(':post', $post);
       $stmt->bindValue(':id', $_POST['id']);
       $stmt->execute();
     } catch (\PDOException $e) {
@@ -139,14 +152,14 @@ try {
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    <title>Blog List</title>
+    <title>Blog administrator</title>
   </head>
   <body>
 
     <div class="container">
       <div class="row">
-        <div class="offset-3 col-6">
-          <h1>Blog Administration</h1>
+        <div class="offset-2 col-8">
+          <h1 style="text-align:center;">Blog Administration</h1>
 
           <form action="" method="POST">
             <div class="input-group mb-3">
@@ -181,7 +194,7 @@ try {
                   <input type="submit" name="deleteBtn" value="Delete" class="btn btn-danger">
                 </form>
 
-                <button type="button" class="btn btn-warning float-right" data-toggle="modal" data-target="#exampleModal" data-pun="<?=htmlentities($pun['content'])?>" data-id="<?=htmlentities($pun['id'])?>">Update</button>
+                <button type="button" class="btn btn-warning float-right" data-toggle="modal" data-target="#exampleModal" data-title="<?=htmlentities($pun['title'])?>" data-pun="<?=htmlentities($pun['content'])?>" data-id="<?=htmlentities($pun['id'])?>">Update</button>
               </li>
             <?php } ?>
             
@@ -190,12 +203,12 @@ try {
       </div>
     </div>
 
-
+   
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <div class="modal-content" style="background-color:lightblue;" >
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Update Blog</h5>
+            <h4 class="modal-title" id="exampleModalLabel">Update Blog</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -203,8 +216,13 @@ try {
           <form action="" method="POST">
             <div class="modal-body">
                 <div class="form-group">
-                  <label for="recipient-name" class="col-form-label">Update content here: </label>
+                  
+                  <label for="recipient-name" class="col-form-label">Update Title: </label>
+                  <input type="text" class="form-control" name="title" for="recipient-name">
+                
+                  <label for="recipient-name" class="col-form-label">Update content: </label>  
                   <input type="text" class="form-control" name="pun" for="recipient-name">
+                 
                   <input type="hidden" class="form-control" name="id">
                 </div>
             </div>
@@ -229,13 +247,21 @@ try {
 
   $('#exampleModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Button that triggered the modal
+    var title = button.data('title'); // Extract info from data-* attributes
     var pun = button.data('pun'); // Extract info from data-* attributes
     var id = button.data('id'); // Extract info from data-* attributes
    
     var modal = $(this);
+    modal.find(".modal-body input[name='title']").val(title);
     modal.find(".modal-body input[name='pun']").val(pun);
     modal.find(".modal-body input[name='id']").val(id);
   });
 </script>
-  </body>
+
+<style>
+    {
+        background-color: #efebe5;
+    }      
+</style>
+</body>
 </html>
