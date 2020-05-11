@@ -5,7 +5,6 @@ require('dbconnect.php');
 
 //show specific data
 try {
-	
 	$stmt = $dbconnect->prepare("SELECT title,content,author,published_date FROM posts
     WHERE id = :id");
     $stmt->bindValue(':id',$_GET['hidID']);

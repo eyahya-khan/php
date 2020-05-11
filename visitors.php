@@ -3,7 +3,7 @@
 require('dbconnect.php'); 
 
 
-//show the table
+//show all posts
 try {
 	
 	$stmt = $dbconnect->query("SELECT * FROM posts");
@@ -29,8 +29,8 @@ try {
   <body>
    
        <div class="container">
-      <div class="row">
-        <div class="offset-2 col-8">
+       <div class="row">
+       <div class="offset-2 col-8">
 
           <h1 style="text-align:center;">All Blog Post with first sentence</h1>
    	
@@ -43,9 +43,14 @@ try {
             <!--Counting the first sentence-->
                     <?php
                     $pos = strpos($post['content'], '.');
-                    $firstSentence = substr($post['content'], 0, $pos+1);
+                    $firstSentence = substr($post['content'], 0, max($pos+1, 30));
                     echo $firstSentence;
                     ?>
+                    
+              
+                    
+                    
+                    
             <!--sending id to individual.php page for fetching specific data-->
                      <br><a href="individual.php?hidID=<?=$post['id']?>">read more</a>
              
