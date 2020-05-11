@@ -56,16 +56,14 @@ if (isset($_POST['addBtn'])) {
   }else if(strlen($title) > 30){
        $message = 
       '<div class="alert alert-danger" role="alert">
-    Blog title must have less than 30 characters.
+        Title must have less than 30 characters.
       </div>';
   }else if(strlen($author)> 30){
        $message = 
       '<div class="alert alert-danger" role="alert">
         Author name must have less than 30 characters.
       </div>';
-  }
-    
-    
+  }  
     else {
     try {
       $query = "
@@ -80,8 +78,8 @@ if (isset($_POST['addBtn'])) {
       $stmt->execute();
         
     $message = 
-      '<div class="alert alert-danger" role="alert">
-        Successfully uploaded.
+      '<div class="alert alert-success" role="alert">
+        Your post uploaded successfully.
       </div>';
         
     } catch (\PDOException $e) {
@@ -94,10 +92,10 @@ if (isset($_POST['addBtn'])) {
 // Update blog
 if (isset($_POST['updateBtn'])) { 
   $title = trim($_POST['title']);
-  $post = trim($_POST['pun']);
+  $content = trim($_POST['content']);
   $author = trim($_POST['author']);
 
-  if (empty($post)) {
+  if (empty($content)) {
     $message = 
       '<div class="alert alert-danger" role="alert">
         Blog post field must not be empty
@@ -116,13 +114,13 @@ if (isset($_POST['updateBtn'])) {
     try {
       $query = "
         UPDATE posts
-        SET content = :post,title = :title,author = :author
+        SET content = :content,title = :title,author = :author
         WHERE id = :id;
       ";
 
       $stmt = $dbconnect->prepare($query);
       $stmt->bindValue(':title', $title);
-      $stmt->bindValue(':post', $post);
+      $stmt->bindValue(':content', $content);
       $stmt->bindValue(':author', $author);
       $stmt->bindValue(':id', $_POST['id']);
       $stmt->execute();
@@ -172,7 +170,7 @@ try {
             <div class="input-group mb-3">
               <input type="text" name="title" class="form-control" placeholder="Blog tilte">
               
-              <input type="text" name="content" class="form-control" placeholder="Blog content">
+                <textarea type="text" name="content" class="form-control" placeholder="Blog content"></textarea>
               
               <input type="text" name="author" class="form-control" placeholder="Author name">
               
@@ -201,7 +199,7 @@ try {
                   <input type="submit" name="deleteBtn" value="Delete" class="btn btn-danger">
                 </form>
 
-                <button type="button" class="btn btn-warning float-right" data-toggle="modal" data-target="#exampleModal" data-title="<?=htmlentities($pun['title'])?>" data-author="<?=htmlentities($pun['author'])?>" data-pun="<?=htmlentities($pun['content'])?>" data-id="<?=htmlentities($pun['id'])?>">Update</button>
+                <button type="button" class="btn btn-warning float-right" data-toggle="modal" data-target="#exampleModal" data-title="<?=htmlentities($pun['title'])?>" data-author="<?=htmlentities($pun['author'])?>" data-content="<?=htmlentities($pun['content'])?>" data-id="<?=htmlentities($pun['id'])?>">Update</button>
               </li>
             <?php } ?>
             
@@ -228,7 +226,7 @@ try {
                   <input type="text" class="form-control" name="title" for="recipient-name">
                 
                   <label for="recipient-name" class="col-form-label">Update content: </label>  
-                  <input type="text" class="form-control" name="pun" for="recipient-name">
+                    <textarea class="form-control" name="content" for="recipient-name"></textarea>
                   
                   <label for="recipient-name" class="col-form-label">Update author: </label>  
                   <input type="text" class="form-control" name="author" for="recipient-name">
@@ -258,13 +256,13 @@ try {
   $('#exampleModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget); // Button that triggered the modal
     var title = button.data('title'); // Extract info from data-* attributes
-    var pun = button.data('pun'); // Extract info from data-* attributes
+    var content = button.data('content'); // Extract info from data-* attributes
     var author = button.data('author'); // Extract info from data-* attributes
     var id = button.data('id'); // Extract info from data-* attributes
    
     var modal = $(this);
     modal.find(".modal-body input[name='title']").val(title);
-    modal.find(".modal-body input[name='pun']").val(pun);
+    modal.find(".modal-body textarea[name='content']").val(content);
     modal.find(".modal-body input[name='author']").val(author);
     modal.find(".modal-body input[name='id']").val(id);
   });
